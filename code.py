@@ -9,6 +9,8 @@ font.init()
 window = display.set_mode((800,500))
 clock = time.Clock()
 display.set_caption('Пинг - понг')
+global win
+win = 0
 global Game
 Game = True
 global bally
@@ -60,12 +62,18 @@ class Ball(GameSprite):
         if self.rect.y < 5:
             bally *= -1
             ballx *= 1
-        if self.rect.x < 20:
-            Game = False
+    def check_win(self):
+        if self.rect.x < 10:  
             win = 1
+            ballx = 0
+            bally = 0
+            window.blit(win2,(170,200))
         if self.rect.x > 780:
-            Game = False
             win = 2
+            ballx = 0
+            bally = 0
+            window.blit(win1,(170,200))
+
     def draw(self):
         window.blit(self.image,(self.rect.x,self.rect.y))
 
@@ -73,41 +81,39 @@ class Ball(GameSprite):
 player1 = Player('roketka.png',10,200,0,10,50)
 player2 = Player('roketka.png',780,200,0,10,50)
 ball = Ball('ball123.png',390,240,0,10,10)
-win1 = font.render('Победил игрок слева!',True,[0,255,0])
-win2 = font.render('Победил игрок справа!',True,[0,255,0])
-while run:
+win1 = font.render('Победил игрок слева!',True,[12,100,16])
+win2 = font.render('Победил игрок справа!',True,[12,100,16])
+
+while Game:
     for e in event.get():
         if e.type == QUIT:
             Game = False
 
-    while Game:
-        for e in event.get():
-            if e.type == QUIT:
-                Game = False
-    
-        window.blit(qwerty123,(0,0))
-        player1.update_r()
-        player2.update_l()
-        ball.update()
-        ball.draw()
-        player1.reset()
-        player2.reset()
-        if sprite.collide_rect(ball,player1) or sprite.collide_rect(ball,player2):
-            ballx *= -1
-            randnum = randint(0,1)
-            if randnum == 0:
-                randy = 1
-            elif randnum == 1:
-                randy = -1
-            bally *= randy
-        display.update()
-        clock.tick(fps)
+    window.blit(qwerty123,(0,0))
+    player1.update_r()
+    player2.update_l()
+    ball.update()
+    ball.draw()
+    ball.check_win()
+    player1.reset()
+    player2.reset()
+    if sprite.collide_rect(ball,player1) or sprite.collide_rect(ball,player2):
+        ballx *= -1
+        randnum = randint(0,1)
+        if randnum == 0:
+            randy = 1
+        elif randnum == 1:
+            randy = -1
+        bally *= randy
     if win == 1:
-        window.blit(win1,(300,200))
-    elif win == 2:
+        ballx *= 0
+        bally *= 0
+        window.blit(win1,(300,200))   
+    if win == 2:
+        ballx *= 0
+        bally *= 0
         window.blit(win2,(300,200))
-
-
-
     display.update()
     clock.tick(fps)
+
+
